@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="$request.locale_name">
+  <head>
+      <meta charset="UTF-8">
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="//oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="//oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="//oss.maxcdn.com/libs/twitter-bootstrap/3.0.3/js/bootstrap.min.js"></script>
+    <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>
+    <script>
+        (function($, undefined){})(jQuery);
+    </script>
+  </head>
+  <body>
+    <select id="city">
+        <option disabled>Выберите  город</option>
+    </select>
+    <script type="text/javascript">
+        $(function(){
+            $.getJSON('data/city.json', function(data) {
+                $.each(data, function(key, val) {
+                    $('#city').append('<option value="' + val + '">' + key + '</option>');
+                });
+            });
+        });
+    </script>
+    <select id="street">
+        <option disabled>Выберите  улицу</option>
+    </select>
+    <script type="text/javascript">
+        //этот скрипт должен отправить на сервер выбранный город, а сервер сформирует соотвутствующий street.json
+        //я заготовил определенные JSON-чик для Москвы
+        //$(function(){
+        //    var data = {$("#city").text() : $("#city").val() }
+        //    $.ajax({
+        //    url:'test.html',
+        //    type:'POST',
+        //    data:'Data=' + $.toJSON(data)
+        //    });
+        //})
+        $(function(){
+            $.getJSON('data/street.json', function(data) {
+                $.each(data, function(key, val) {
+                    $('#street').append('<option value="' + val + '">' + key + '</option>');
+                });
+            });
+        });
+    </script>
+    <select id="house_number">
+        <option disabled>Выберите  номер дома</option>
+    </select>
+    <script type="text/javascript">
+        //этот скрипт должен отправить на сервер выбранную улицу, а сервер сформирует соотвутствующий  house_number.json
+        //я заготовил определенные JSON-чик для улицы Комсомольской
+        //$(function(){
+        //    var data = {$("#street").text() : $("#street").val() }
+        //    $.ajax({
+        //    url:'test.html',
+        //    type:'POST',
+        //    data:'Data=' + $.toJSON(data)
+        //    });
+        //})
+        $(function(){
+            $.getJSON('data/house_number.json', function(data) {
+                $.each(data, function(key, val) {
+                    $('#house_number').append('<option value="' + val + '">' + key + '</option>');
+                });
+            });
+        });
+    </script>
+      <div id="map" style="width: 600px; height: 400px">
+          <script type="text/javascript">
+              //этот скрипт должен отправить на сервер выбранный город-улицу-дом, а сервер сформирует соотвутствующий  information.json
+              // с координатами здания и описанием здания
+              //я заготовил определенные JSON-чик для Москвы улицы Комсомольской, 28
+              //$(function(){
+              //    var data = {$("#city").text() : $("#city").val(),
+              //                $("#street").text() : $("#street").val(),
+              //                $("#house_number").text() : $("#house_number").val()}
+              //    $.ajax({
+              //    url:'test.html',
+              //    type:'POST',
+              //    data:'Data=' + $.toJSON(data)
+              //    });
+              //})
+              var lat,lon,inf;
+              $(function(){
+                 $.getJSON('data/information.json', function(data) {
+                    lat = data.lat;
+                    lon = data.lon;
+                    inf = data.description;
+                 });
+              });
+              ymaps.ready(init);
+              var myMap,
+                  placemark;
+              function init(){
+                myMap = new ymaps.Map("map", {
+                center: [lat, lon],
+                zoom: 18
+                });
+                placemark = new ymaps.Placemark([lat, lon], {balloonContent: inf});
+                myMap.geoObjects.add(placemark);
+              }
+          </script>
+      </div>
+  </body>
+</html>
